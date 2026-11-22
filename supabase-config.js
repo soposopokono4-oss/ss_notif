@@ -5,5 +5,5 @@ window.SMARTSTUDY_CONFIG = {
   SUPABASE_URL: 'https://vihcdajsxzamxvhcjppl.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_Ec-sz-iF_rUYij_TIomqgA_dde9lZqG',
   // Kunci publik VAPID boleh diletakkan di frontend. Kunci privat tetap di Supabase Secrets.
-  VAPID_PUBLIC_KEY: 'BGj1Z1XIVfoSYlxrtoPQkURcRtHy_AvqHSAizsMWwvwpPkVGxAAdc2z2BMcQ3qfLuj6kiYNeXxsKePWQZADX4Pw'
+  VAPID_PUBLIC_KEY: 'BBPRlPmM1vFmER9xEJTwmwETBnEBfYypx1W4ufp1qQiejGTVbiMdUpqb2qRfw11KfAluIjpgGqmvRyfHw-BkpDc'
 };
