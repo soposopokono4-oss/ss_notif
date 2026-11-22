@@ -193,10 +193,18 @@ Deno.serve(async (req) => {
       .eq("user_id", row.user_id);
 
     if (deviceError) {
-      console.error("Subscription query error:", deviceError);
-      failed++;
-      continue;
-    }
+  console.error("FAILED_STAGE: subscription_query", deviceError);
+  failed++;
+  continue;
+}
+
+if (!devices?.length) {
+  console.error("FAILED_STAGE: no_subscription", {
+    user_id: row.user_id
+  });
+  failed++;
+  continue;
+}
 
     if (!devices?.length) continue;
 
@@ -212,10 +220,10 @@ Deno.serve(async (req) => {
     if (claimError?.code === "23505") continue;
 
     if (claimError) {
-      console.error("Reminder claim error:", claimError);
-      failed++;
-      continue;
-    }
+  console.error("FAILED_STAGE: sent_reminders_insert", claimError);
+  failed++;
+  continue;
+}
 
     let delivered = 0;
 
@@ -233,7 +241,10 @@ Deno.serve(async (req) => {
         delivered++;
       } catch (error) {
         const status = (error as any)?.statusCode;
-        console.error("Web Push failed:", status, error);
+        console.error("FAILED_STAGE: web_push", {
+  status,
+  message: String(error)
+});
 
         if (status === 404 || status === 410) {
           await admin.from("push_subscriptions")
