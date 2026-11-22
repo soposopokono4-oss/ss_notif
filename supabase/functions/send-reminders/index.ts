@@ -71,12 +71,36 @@ Deno.serve(async (req) => {
   const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY");
   const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY");
   const vapidSubject = Deno.env.get("VAPID_SUBJECT") || "mailto:admin@example.com";
-  if (!supabaseUrl || !serviceRole || !vapidPublic || !vapidPrivate) return json({ error: "Missing server configuration" }, 500);
-  webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
+  if (!supabaseUrl || !serviceRole || !vapidPublic || !vapidPrivate) {
+  console.error("Missing server configuration:", {
+    SUPABASE_URL: !!supabaseUrl,
+    SUPABASE_SERVICE_ROLE_KEY: !!serviceRole,
+    VAPID_PUBLIC_KEY: !!vapidPublic,
+    VAPID_PRIVATE_KEY: !!vapidPrivate,
+  });
+
+  return json({ error: "Missing server configuration" }, 500);
+}
+  try {
+  webpush.setVapidDetails(
+    vapidSubject,
+    vapidPublic,
+    vapidPrivate
+  );
+} catch (error) {
+  console.error("VAPID configuration error:", error);
+  return json({ error: "Invalid VAPID configuration" }, 500);
+}
   const admin = createClient(supabaseUrl, serviceRole, { auth: { persistSession: false, autoRefreshToken: false } });
   const now = new Date();
-  const { data: rows, error: readError } = await admin.from("study_data").select("user_id,schedules,tasks");
-  if (readError) return json({ error: readError.message }, 500);
+  const { data: rows, error: readError } = await admin
+  .from("study_data")
+  .select("user_id,schedules,tasks");
+
+if (readError) {
+  console.error("Study data query error:", readError);
+  return json({ error: readError.message }, 500);
+}
   let checked = 0, sent = 0, failed = 0;
   for (const row of rows || []) {
     const reminders = dueReminders(row.user_id, row.schedules || [], row.tasks || [], now);
